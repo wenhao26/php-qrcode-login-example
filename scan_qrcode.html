@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>扫码页面</title>
+    <style>
+        .main {
+            margin: 200px auto;
+            width: 205px;
+            height: 205px;
+        }
+    </style>
+</head>
+<body>
+<div class="main">
+    <div id="qrcode"></div>
+    <p>手机端扫码，模拟扫码登录</p>
+</div>
+
+<script src="static/jquery-3.7.1.min.js"></script>
+<script type="text/javascript" src="static/jquery.qrcode.min.js"></script>
+<script>
+    jQuery(function () {
+        jQuery('#qrcode').qrcode({
+            render: "canvas",
+            width: 200,
+            height: 200,
+            foreground: "#222",
+            background: "#FFF",
+            text: "http://192.168.6.158/scan-qrcode-login/auth.html?token=1c8c761abd180eaed1" // TODO 仅用于测试，实际该地址由服务端生成返回
+        });
+    })
+
+    // SSE
+    url = "auth_listener.php?token=1c8c761abd180eaed1";
+    var source = new EventSource(url);
+    source.onmessage = function (event) {
+        console.info(event.data)
+        if (event.data !== 'monitor') {
+            var data = eval('(' + event.data + ')');
+
+            redirect = 'profile.php?uid=' + data.uid + '&time=' + data.time
+            window.location.replace(redirect);
+        }
+    };
+
+</script>
+</body>
+</html>
